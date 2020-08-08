@@ -5,8 +5,9 @@ const fs = require('fs');
 let balls = [];
 let results = {};
 let file = '';
-
-
+const storedFile = '/home/hardif/Desktop/secret/file-counter.json'
+let countNumber;
+let goodLuck = [ 34, 38, 6, 31, 25]
 
 // shuffle balls like lotery 5 times
 
@@ -38,9 +39,9 @@ function getResult() {
         31, 32, 33, 34, 35, 36, 37, 38, 39, 40
       ];
     for (let index = 1; index <= 5; index++) {
-        selectedBall = selectBall();
-        secret.push(selectedBall);
-        balls.splice(balls.indexOf(selectedBall), 1);
+        selectedBall = selectBall(); //Select one
+        secret.push(selectedBall);// add it to an array
+        balls.splice(balls.indexOf(selectedBall), 1);//remove it from the array of balls
         
     }
 
@@ -52,19 +53,48 @@ function getResult() {
 function resultJson() {
     let result;
     //4496388
+    fileNumber();
     for (let index = 0; index < 4496388; index++) {
         result = getResult();
         results[index] = result;
+        if(JSON.stringify(result) === JSON.stringify(goodLuck)){
+            let objBingo = {
+                objIndex: index
+            }
+            
+            let bingo = JSON.stringify(objBingo,null,1);
+            let bingoFile = '/home/hardif/Desktop/secret/bingo/file-'+ countNumber +'.json';
+            fs.writeFileSync(bingoFile, bingo);
+        }
     }
+    
+    
+    jsonFileName();
+
 }
 
 
+function jsonFileName() {
+
+    let strResults = JSON.stringify(results,null,1);
+    let newfile = '/home/hardif/Desktop/secret/results/file-'+ countNumber +'.json';
+
+    fs.writeFileSync(newfile, strResults);
+}
 
 
-    resultJson();
-    let data1 = JSON.stringify(results);
-    file = './test/file-2.json';
-    fs.writeFileSync(file, data1);
+function fileNumber() {
+    let getFileNumber = fs.readFileSync(storedFile);
+    let fileObj = JSON.parse(getFileNumber);
+    countNumber = Object.keys(fileObj).length;
+    fileObj[countNumber] = countNumber;
+    let newData = JSON.stringify(fileObj, null, 1);
+    fs.writeFileSync(storedFile, newData);
+
+
+}
+resultJson();
+    
     
 
 
